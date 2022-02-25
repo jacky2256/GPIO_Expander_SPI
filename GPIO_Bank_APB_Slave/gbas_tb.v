@@ -15,8 +15,8 @@ reg 				            penable;
 reg 	[DATA_WIDTH - 1 : 0]	pwdata;
 wire	[DATA_WIDTH - 1 : 0]	prdata;
 wire				            pready;
-reg [DATA_WIDTH - 1 : 0] reg_reading;
-reg [DATA_WIDTH - 1 : 0] reg_writing;
+reg     [DATA_WIDTH - 1 : 0]    reg_reading;
+reg     [DATA_WIDTH - 1 : 0]    reg_writing;
 
 reg		    [7 : 0]          y;
 wire        [7 : 0]          oe;

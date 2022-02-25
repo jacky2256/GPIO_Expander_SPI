@@ -26,14 +26,14 @@ reg [7:0] reg_pd;
 reg [7:0] reg_a;
 reg [7:0] reg_y;
 
-wire [7:0] wire_y;
 
-reg [1:0] counter;
-wire r_counter_en;
-wire w_counter_en;
-reg pready_reg;
-wire write_en;
-wire read_en;
+reg 	[1:0] 	 counter;
+wire 	[7:0]	 wire_y;
+wire 			 r_counter_en;
+wire 			 w_counter_en;
+reg 			 pready_reg;
+wire 			 write_en;
+wire 			 read_en;
 
 assign write_en = 	 pwrite & pselx;
 assign read_en	=	!pwrite & pselx;
@@ -44,7 +44,6 @@ always @(posedge pclk or negedge presetn) begin
 		reg_pd	<= 8'h00;
 		reg_pu	<= 8'h00;
 		reg_a	<= 8'h00;
-		//reg_y	<= 8'h00;
 	end 
 	else begin
 		if(write_en & pready) begin
