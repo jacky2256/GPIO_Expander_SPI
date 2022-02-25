@@ -2,14 +2,14 @@
 `include "GPIO_PAD.v"
 
 module GPIO_PAD_tb();
-wire	[1:0] pad;
-reg    	padi;   	
+wire	[1:0] 	pad;
+reg    			padi;   	
 
-reg		[1:0] a;
-reg		[1:0] oe;			
-reg		[1:0] pu;				
-reg		[1:0] pd;				
-wire	[1:0] y;
+reg		[1:0] 	a;
+reg		[1:0] 	oe;			
+reg		[1:0] 	pu;				
+reg		[1:0] 	pd;				
+wire	[1:0] 	y;
 
 assign (strong0, strong1) pad[1] = (padi)? 1'b1: 1'b0;
 
