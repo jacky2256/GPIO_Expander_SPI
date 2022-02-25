@@ -13,11 +13,11 @@
 				output  reg	[DATA_WIDTH-1 : 0]	prdata,
 				output 							pready,
 
-				input		[7 : 0]            y,
-				output		[7 : 0]            oe,
-				output		[7 : 0]            pu,
-				output		[7 : 0]            pd,
-				output		[7 : 0]            a
+				input		[7 : 0]            	y,
+				output		[7 : 0]            	oe,
+				output		[7 : 0]            	pu,
+				output		[7 : 0]            	pd,
+				output		[7 : 0]            	a
 				);
 
 reg [7:0] reg_oe;
