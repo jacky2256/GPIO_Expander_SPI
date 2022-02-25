@@ -1,0 +1,12 @@
+**** module/scope: GPIO_PAD
+     Flip-Flops   : 0
+     Logic Gates  : 6
+     MUX[2]: 2 slices
+     LOG[13]: 1 unaccounted
+     LOG[14]: 1 unaccounted
+**** TOTALS
+     Flip-Flops   : 0
+     Logic Gates  : 6
+     MUX[2]: 2 slices
+     LOG[13]: 1 unaccounted
+     LOG[14]: 1 unaccounted
