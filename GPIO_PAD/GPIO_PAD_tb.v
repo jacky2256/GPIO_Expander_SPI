@@ -3,7 +3,7 @@
 
 module GPIO_PAD_tb();
 wire	[1:0] pad;
-reg    padi;   	
+reg    	padi;   	
 
 reg 	[1:0] a;
 reg	    [1:0] oe;			
