@@ -5,7 +5,8 @@
 | reg_oe   | 0x00  | 0x00  |  R/W       |
 | reg_pu   | 0x01  | 0x00  |  R/W       |
 | reg_pd   | 0x02  | 0x00  |  R/W       |
-| reg_a   | 0x03  | 0x00  |    R       |
+| reg_a    | 0x03  | 0x00  |  R/W       |
+| reg_a    | 0x04  | 0x00  |  R         |
 
 
 ## Регистр reg_oe.
