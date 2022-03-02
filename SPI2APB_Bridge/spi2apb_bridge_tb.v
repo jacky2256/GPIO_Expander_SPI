@@ -1,13 +1,28 @@
 `timescale 1ns/1ps
 `include "spi2apb_bridge.v"
 
-module spi2apb_bridge_tb();
+module spi2apb_bridge_tb#(
+			        parameter BANK_NUM      = 	3,
+				parameter DATA_WIDTH 	= 	8,
+				parameter ADDR_WIDTH	=	7
+				)
+                                ();
 reg     clk;
 reg     sclk;
 reg     resetn;
 reg     mosi;
 reg     ss;
 wire	miso;
+
+reg b_pready;
+wire b_pclk;
+wire b_resetn;
+wire b_pwrite;
+wire b_penable;
+wire [BANK_NUM-1   : 0] b_psel;
+wire [DATA_WIDTH-1 : 0] b_pwdata;
+wire [ADDR_WIDTH-1 : 0] b_paddr;
+reg  [DATA_WIDTH-1 : 0] b_prdata;
 
 reg [15:0] reg_mosi_tb;
 reg [15:0] reg_miso_tb;
@@ -56,7 +71,7 @@ initial begin
         #3 resetn = 0;
         #3 resetn = 1;
         #100
-        en_trans(16'hfcfc);
+        en_trans(16'hffff);
         #100
         en_trans(16'h1234);
         #100
