@@ -72,13 +72,14 @@ initial begin
         #3 resetn = 1;
         #100
         en_trans(16'hffff);
-        #100
+       /* #100
         en_trans(16'h1234);
         #100
         en_trans(16'h7645);
         #100
         $display("Test complet");
-        #100 $finish;
+        */
+        #500 $finish;
 end
 
 //assign miso = (!ss)? reg_miso_tb[15] : 1'b0;

@@ -1,7 +1,7 @@
 module spi2apb_bridge #(
-						parameter BANK_NUM 		= 	3,
+						parameter BANK_NUM 		= 	2,
 						parameter DATA_WIDTH 	= 	8,
-						parameter ADDR_WIDTH	=	7
+						parameter ADDR_WIDTH	=	3
 						)(
                         input 			sclk,
                         input 			resetn,
@@ -13,11 +13,11 @@ module spi2apb_bridge #(
                         input								b_pready,
                         output								b_pclk,
                         output								b_resetn,
-                        output		[DATA_WIDTH-1 : 0]		b_pwdata,
+                        output	reg	[DATA_WIDTH-1 : 0]		b_pwdata,
                         output	reg							b_pwrite,
-                        output		[BANK_NUM-1	:	0]		b_psel,
-                        output								b_penable,
-                        output		[ADDR_WIDTH-1 : 0]		b_paddr
+                        output	reg	[BANK_NUM-1	:	0]		b_psel,
+                        output	reg							b_penable,
+                        output	reg	[ADDR_WIDTH-1 : 0]		b_paddr
                         );
 
 reg	[15: 0]	reg_mosi;
@@ -25,6 +25,14 @@ reg [15: 0]	reg_miso;
 
 reg [3 : 0] counter_spi;
 reg	[3 : 0] counter_apb;
+
+wire en_pwrite;
+wire en_paddr;
+wire en_pwdata;
+wire en_psel;
+wire en_penable;
+
+reg en_sclk;
 
 //spi interface
 always @(posedge sclk or negedge resetn) begin
@@ -52,36 +60,30 @@ assign miso = reg_miso[15];
 
 assign sclk = b_pclk;
 
-assign trans_apb = ((counter_spi == 4'b1111) || b_pready)? !trans_apb : 1'b0;
-
-
 // apb interface
-always @(posedge sclk or negedge resetn) begin
+always @(negedge sclk or negedge resetn) begin
 	if(!resetn) begin
 		b_pwrite <= 1'b0; 
+		b_paddr	 <= 7'h0;
+		b_pwdata <= 8'h0;
+		b_psel	 <= 8'h0;
+		b_penable <= 1'b0;
 	end else begin
 		b_pwrite <= (en_pwrite)? reg_mosi[0] : b_pwrite;
-	end
-end
-
-assign	en_pwrite	= (counter_spi == 4'b0001)? 1'b1 : 1'b0;
-
-/*
-always @(posedge sclk or negedge resetn) begin
-	if(resetn) begin
-		counter_apb <= 4'b0000;
-	end else begin
-		if(trans_apb) begin
-			counter_apb <= counter_apb + 1'b1; 
-		end
+		b_paddr	 <= (en_paddr)?  reg_mosi[2:0] : b_paddr;
+		b_pwdata <= (en_pwdata)? reg_mosi[7:0] : b_pwdata;
+		b_psel	 <= (en_psel)?	 reg_mosi[BANK_NUM-1:0] : b_psel; 
+		b_penable <= (en_penable)?  1'b1 : b_penable;
 	end
 end
 
 
-assign	b_paddr		= (counter_apb == 4'b0001)? reg_mosi[10:8] : 8'h00;
-assign	b_psel		= (counter_apb == 4'b0001)? reg_mosi[14:12] : 2'b00;
-assign	b_pwdata	= (counter_apb == 4'b0001 && reg_mosi[15])? reg_mosi[7:0] : 8'h00;
-assign	b_penable	= (counter_apb == 4'b0010)? 1'b1 : 1'b0;
-*/
+assign	en_pwrite	= (counter_spi == 4'h1)? 1'b1 : 1'b0;
+assign  en_paddr	= (counter_spi == 4'h8)? 1'b1 : 1'b0;
+assign	en_pwdata	= (counter_spi == 4'h0)? 1'b1 : 1'b0;
+assign  en_psel		= (counter_spi == 4'h3)? 1'b1 : 1'b0;	
+assign	en_penable	= (counter_spi == 4'hd)? 1'b1 : 1'b0;	//доделать
+assign b_resetn = resetn; 
+
 
 endmodule
