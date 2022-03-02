@@ -1,0 +1,259 @@
+#! /c/Source/iverilog-install/bin/vvp
+:ivl_version "12.0 (devel)" "(s20150603-1110-g18392a46)";
+:ivl_delay_selection "TYPICAL";
+:vpi_time_precision - 12;
+:vpi_module "C:\iverilog\lib\ivl\system.vpi";
+:vpi_module "C:\iverilog\lib\ivl\vhdl_sys.vpi";
+:vpi_module "C:\iverilog\lib\ivl\vhdl_textio.vpi";
+:vpi_module "C:\iverilog\lib\ivl\v2005_math.vpi";
+:vpi_module "C:\iverilog\lib\ivl\va_math.vpi";
+S_000001892634a750 .scope module, "spi2apb_bridge_tb" "spi2apb_bridge_tb" 2 4;
+ .timescale -9 -12;
+v00000189263b3140_0 .var "clk", 0 0;
+v00000189263b3000_0 .net "miso", 0 0, L_00000189263b35a0;  1 drivers
+v00000189263b3a00_0 .var "mosi", 0 0;
+v00000189263b3820_0 .var "reg_miso_tb", 15 0;
+v00000189263b38c0_0 .var "reg_mosi_tb", 15 0;
+v00000189263b2ce0_0 .var "resetn", 0 0;
+v00000189263b31e0_0 .var "sclk", 0 0;
+v00000189263b3320_0 .var "ss", 0 0;
+S_00000189261fbb80 .scope task, "en_transmit" "en_transmit" 2 26, 2 26 0, S_000001892634a750;
+ .timescale -9 -12;
+v000001892634a1f0_0 .var/i "i", 31 0;
+E_0000018926349be0 .event posedge, v00000189263b3140_0;
+TD_spi2apb_bridge_tb.en_transmit ;
+    %wait E_0000018926349be0;
+    %pushi/vec4 0, 0, 1;
+    %store/vec4 v00000189263b3320_0, 0, 1;
+    %pushi/vec4 65535, 0, 16;
+    %store/vec4 v00000189263b38c0_0, 0, 16;
+    %load/vec4 v00000189263b38c0_0;
+    %parti/s 1, 0, 2;
+    %store/vec4 v00000189263b3a00_0, 0, 1;
+    %load/vec4 v00000189263b3000_0;
+    %ix/load 4, 15, 0;
+    %flag_set/imm 4, 0;
+    %store/vec4 v00000189263b3820_0, 4, 1;
+    %pushi/vec4 0, 0, 32;
+    %store/vec4 v000001892634a1f0_0, 0, 32;
+T_0.0 ;
+    %load/vec4 v000001892634a1f0_0;
+    %cmpi/s 32, 0, 32;
+    %jmp/0xz T_0.1, 5;
+    %wait E_0000018926349be0;
+    %load/vec4 v00000189263b31e0_0;
+    %nor/r;
+    %store/vec4 v00000189263b31e0_0, 0, 1;
+    %load/vec4 v00000189263b31e0_0;
+    %nor/r;
+    %flag_set/vec4 8;
+    %jmp/0xz  T_0.2, 8;
+    %load/vec4 v00000189263b38c0_0;
+    %ix/load 4, 1, 0;
+    %flag_set/imm 4, 0;
+    %shiftr 4;
+    %store/vec4 v00000189263b38c0_0, 0, 16;
+    %load/vec4 v00000189263b38c0_0;
+    %parti/s 1, 0, 2;
+    %store/vec4 v00000189263b3a00_0, 0, 1;
+    %load/vec4 v000001892634a1f0_0;
+    %cmpi/s 30, 0, 32;
+    %flag_mov 8, 5;
+    %jmp/0 T_0.4, 8;
+    %load/vec4 v00000189263b3000_0;
+    %jmp/1 T_0.5, 8;
+T_0.4 ; End of true expr.
+    %load/vec4 v00000189263b3820_0;
+    %parti/s 1, 15, 5;
+    %jmp/0 T_0.5, 8;
+ ; End of false expr.
+    %blend;
+T_0.5;
+    %ix/load 4, 15, 0;
+    %flag_set/imm 4, 0;
+    %store/vec4 v00000189263b3820_0, 4, 1;
+T_0.2 ;
+    %wait E_0000018926349be0;
+    %load/vec4 v000001892634a1f0_0;
+    %cmpi/s 30, 0, 32;
+    %jmp/0xz  T_0.6, 5;
+    %load/vec4 v00000189263b31e0_0;
+    %flag_set/vec4 8;
+    %jmp/0 T_0.8, 8;
+    %load/vec4 v00000189263b3820_0;
+    %ix/load 4, 1, 0;
+    %flag_set/imm 4, 0;
+    %shiftr 4;
+    %jmp/1 T_0.9, 8;
+T_0.8 ; End of true expr.
+    %load/vec4 v00000189263b3820_0;
+    %jmp/0 T_0.9, 8;
+ ; End of false expr.
+    %blend;
+T_0.9;
+    %store/vec4 v00000189263b3820_0, 0, 16;
+T_0.6 ;
+    %load/vec4 v000001892634a1f0_0;
+    %addi 1, 0, 32;
+    %store/vec4 v000001892634a1f0_0, 0, 32;
+    %jmp T_0.0;
+T_0.1 ;
+    %wait E_0000018926349be0;
+    %pushi/vec4 1, 0, 1;
+    %store/vec4 v00000189263b3320_0, 0, 1;
+    %end;
+S_00000189261f63a0 .scope module, "i0" "spi2apb_bridge" 2 15, 3 1 0, S_000001892634a750;
+ .timescale -9 -12;
+    .port_info 0 /INPUT 1 "sclk";
+    .port_info 1 /INPUT 1 "resetn";
+    .port_info 2 /INPUT 1 "mosi";
+    .port_info 3 /INPUT 1 "ss";
+    .port_info 4 /OUTPUT 1 "miso";
+    .port_info 5 /INPUT 1 "b_prdata";
+    .port_info 6 /INPUT 1 "b_pready";
+    .port_info 7 /OUTPUT 1 "b_pclk";
+    .port_info 8 /OUTPUT 1 "b_resetn";
+    .port_info 9 /OUTPUT 1 "b_pwdata";
+    .port_info 10 /OUTPUT 1 "b_pwrite";
+    .port_info 11 /OUTPUT 1 "b_psel";
+    .port_info 12 /OUTPUT 1 "b_penable";
+    .port_info 13 /OUTPUT 1 "b_paddr";
+o0000018926361fe8 .functor BUFZ 1, C4<z>; HiZ drive
+v00000189263573d0_0 .net "b_paddr", 0 0, o0000018926361fe8;  0 drivers
+o0000018926362018 .functor BUFZ 1, C4<z>; HiZ drive
+v00000189261f6620_0 .net "b_pclk", 0 0, o0000018926362018;  0 drivers
+o0000018926362048 .functor BUFZ 1, C4<z>; HiZ drive
+v00000189261f66c0_0 .net "b_penable", 0 0, o0000018926362048;  0 drivers
+o0000018926362078 .functor BUFZ 1, C4<z>; HiZ drive
+v00000189261f6760_0 .net "b_prdata", 0 0, o0000018926362078;  0 drivers
+o00000189263620a8 .functor BUFZ 1, C4<z>; HiZ drive
+v00000189261f6800_0 .net "b_pready", 0 0, o00000189263620a8;  0 drivers
+o00000189263620d8 .functor BUFZ 1, C4<z>; HiZ drive
+v00000189263b2830_0 .net "b_psel", 0 0, o00000189263620d8;  0 drivers
+o0000018926362108 .functor BUFZ 1, C4<z>; HiZ drive
+v00000189263b28d0_0 .net "b_pwdata", 0 0, o0000018926362108;  0 drivers
+o0000018926362138 .functor BUFZ 1, C4<z>; HiZ drive
+v00000189263b2970_0 .net "b_pwrite", 0 0, o0000018926362138;  0 drivers
+o0000018926362168 .functor BUFZ 1, C4<z>; HiZ drive
+v00000189263b2a10_0 .net "b_resetn", 0 0, o0000018926362168;  0 drivers
+v00000189263b2ab0_0 .var "counter", 3 0;
+v00000189263b2ec0_0 .net "miso", 0 0, L_00000189263b35a0;  alias, 1 drivers
+v00000189263b2ba0_0 .net "mosi", 0 0, v00000189263b3a00_0;  1 drivers
+v00000189263b2d80_0 .var "reg_miso", 15 0;
+v00000189263b3280_0 .var "reg_mosi", 15 0;
+v00000189263b3500_0 .net "resetn", 0 0, v00000189263b2ce0_0;  1 drivers
+v00000189263b30a0_0 .net "sclk", 0 0, v00000189263b31e0_0;  1 drivers
+v00000189263b2c40_0 .net "ss", 0 0, v00000189263b3320_0;  1 drivers
+E_0000018926349460 .event negedge, v00000189263b30a0_0;
+E_00000189263496a0/0 .event negedge, v00000189263b3500_0;
+E_00000189263496a0/1 .event posedge, v00000189263b30a0_0;
+E_00000189263496a0 .event/or E_00000189263496a0/0, E_00000189263496a0/1;
+L_00000189263b35a0 .part v00000189263b2d80_0, 15, 1;
+    .scope S_00000189261f63a0;
+T_1 ;
+    %wait E_00000189263496a0;
+    %load/vec4 v00000189263b3500_0;
+    %nor/r;
+    %flag_set/vec4 8;
+    %jmp/0xz  T_1.0, 8;
+    %pushi/vec4 65535, 0, 16;
+    %assign/vec4 v00000189263b2d80_0, 0;
+    %pushi/vec4 0, 0, 16;
+    %assign/vec4 v00000189263b3280_0, 0;
+    %pushi/vec4 0, 0, 4;
+    %assign/vec4 v00000189263b2ab0_0, 0;
+    %jmp T_1.1;
+T_1.0 ;
+    %load/vec4 v00000189263b2c40_0;
+    %nor/r;
+    %flag_set/vec4 8;
+    %jmp/0xz  T_1.2, 8;
+    %load/vec4 v00000189263b2ba0_0;
+    %ix/load 4, 15, 0;
+    %ix/load 5, 0, 0;
+    %flag_set/imm 4, 0;
+    %assign/vec4/off/d v00000189263b3280_0, 4, 5;
+    %load/vec4 v00000189263b2ab0_0;
+    %addi 1, 0, 4;
+    %assign/vec4 v00000189263b2ab0_0, 0;
+    %load/vec4 v00000189263b2d80_0;
+    %ix/load 4, 1, 0;
+    %flag_set/imm 4, 0;
+    %shiftl 4;
+    %assign/vec4 v00000189263b2d80_0, 0;
+    %jmp T_1.3;
+T_1.2 ;
+    %pushi/vec4 0, 0, 4;
+    %assign/vec4 v00000189263b2ab0_0, 0;
+T_1.3 ;
+T_1.1 ;
+    %jmp T_1;
+    .thread T_1;
+    .scope S_00000189261f63a0;
+T_2 ;
+    %wait E_0000018926349460;
+    %load/vec4 v00000189263b2c40_0;
+    %nor/r;
+    %load/vec4 v00000189263b2ab0_0;
+    %pushi/vec4 0, 0, 4;
+    %cmp/ne;
+    %flag_get/vec4 4;
+    %and;
+    %flag_set/vec4 8;
+    %jmp/0xz  T_2.0, 8;
+    %load/vec4 v00000189263b3280_0;
+    %ix/load 4, 1, 0;
+    %flag_set/imm 4, 0;
+    %shiftr 4;
+    %assign/vec4 v00000189263b3280_0, 0;
+T_2.0 ;
+    %jmp T_2;
+    .thread T_2;
+    .scope S_000001892634a750;
+T_3 ;
+    %pushi/vec4 0, 0, 1;
+    %store/vec4 v00000189263b3140_0, 0, 1;
+    %pushi/vec4 0, 0, 1;
+    %store/vec4 v00000189263b31e0_0, 0, 1;
+    %pushi/vec4 1, 0, 1;
+    %store/vec4 v00000189263b2ce0_0, 0, 1;
+    %pushi/vec4 1, 0, 1;
+    %store/vec4 v00000189263b3320_0, 0, 1;
+    %pushi/vec4 65535, 0, 16;
+    %store/vec4 v00000189263b38c0_0, 0, 16;
+    %pushi/vec4 0, 0, 16;
+    %store/vec4 v00000189263b3820_0, 0, 16;
+    %end;
+    .thread T_3;
+    .scope S_000001892634a750;
+T_4 ;
+    %vpi_call 2 59 "$dumpfile", "spi2apb_bridge_tb.vcd" {0 0 0};
+    %vpi_call 2 60 "$dumpvars", 32'sb00000000000000000000000000000000, S_000001892634a750 {0 0 0};
+    %vpi_call 2 61 "$display", "Module %m" {0 0 0};
+    %delay 3000, 0;
+    %pushi/vec4 0, 0, 1;
+    %store/vec4 v00000189263b2ce0_0, 0, 1;
+    %delay 3000, 0;
+    %pushi/vec4 1, 0, 1;
+    %store/vec4 v00000189263b2ce0_0, 0, 1;
+    %fork TD_spi2apb_bridge_tb.en_transmit, S_00000189261fbb80;
+    %join;
+    %vpi_call 2 65 "$display", "Test complet" {0 0 0};
+    %delay 100000, 0;
+    %vpi_call 2 66 "$finish" {0 0 0};
+    %end;
+    .thread T_4;
+    .scope S_000001892634a750;
+T_5 ;
+    %delay 10000, 0;
+    %load/vec4 v00000189263b3140_0;
+    %nor/r;
+    %store/vec4 v00000189263b3140_0, 0, 1;
+    %jmp T_5;
+    .thread T_5;
+# The file index is used to find the file name in the following table.
+:file_names 4;
+    "N/A";
+    "<interactive>";
+    "spi2apb_bridge_tb.v";
+    "./spi2apb_bridge.v";
