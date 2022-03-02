@@ -19,38 +19,35 @@ initial begin
         sclk = 0;
         resetn = 1;
         ss = 1;
-        reg_mosi_tb = 16'hffff;
+        reg_mosi_tb = 16'h0000;
         reg_miso_tb = 16'h0000;
 end
 
-task en_transmit(); 
+task en_trans(input [15:0] data_mosi);
 integer i;
         begin
                 @(posedge clk);
                 ss = 0;
-                reg_mosi_tb = 16'hffff;
+                reg_mosi_tb = data_mosi;
+                mosi = reg_mosi_tb[15];
+                reg_miso_tb[0] = miso;
 
-                mosi = reg_mosi_tb[0];
-                reg_miso_tb [15] = miso;
-
-                for(i = 0; i < 32; i = i + 1) begin
+                for(i = 0; i < 16; i = i + 1) begin
                         @(posedge clk);
                         sclk = !sclk;
-                        if(!sclk) begin 
-                            reg_mosi_tb = reg_mosi_tb >> 1'b1;
-                            mosi = reg_mosi_tb[0];
-                            reg_miso_tb [15] = (i < 30)? miso : reg_miso_tb [15];
-                        end
+                        reg_miso_tb = reg_miso_tb << 1'b1;
                         @(posedge clk);
-                        if(i < 30)
-                                reg_miso_tb = (sclk)? (reg_miso_tb >> 1'b1) : reg_miso_tb;
+                        reg_mosi_tb = reg_mosi_tb << 1'b1;
+                        @(posedge clk);
+                        sclk = !sclk;
+                        mosi = reg_mosi_tb[15];
+                        reg_miso_tb[0] = (i != 15)? miso : reg_miso_tb[0];
+                        @(posedge clk);
                 end
-
                 @(posedge clk);
                 ss = 1;
         end
 endtask
-
 
 initial begin
         $dumpfile("spi2apb_bridge_tb.vcd");
@@ -58,10 +55,18 @@ initial begin
         $display("Module %m") ;
         #3 resetn = 0;
         #3 resetn = 1;
-        en_transmit();
+        #100
+        en_trans(16'hfcfc);
+        #100
+        en_trans(16'h1234);
+        #100
+        en_trans(16'h7645);
+        #100
         $display("Test complet");
         #100 $finish;
 end
+
+//assign miso = (!ss)? reg_miso_tb[15] : 1'b0;
 
 always #10 clk = !clk; 
 
