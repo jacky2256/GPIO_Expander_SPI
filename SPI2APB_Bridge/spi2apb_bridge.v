@@ -29,7 +29,6 @@ always @(posedge sclk or negedge resetn) begin
 		if(!ss) begin
 		 	reg_mosi [15] 	<= mosi;
 		 	counter 		<= counter + 1'b1;
-		 	//reg_mosi	<= reg_mosi >> 1'b1;
 		 	reg_miso	<= reg_miso << 1'b1;
 		end else 
 			counter <= 4'b0000;
