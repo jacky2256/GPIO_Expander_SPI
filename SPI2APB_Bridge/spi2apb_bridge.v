@@ -12,8 +12,8 @@ module spi2apb_bridge #(
                         input		[DATA_WIDTH-1 : 0]		b_prdata,
                         input								b_pready,
                         output								b_pclk,
-                        output								b_resetn,
-                        output	reg	[DATA_WIDTH-1 : 0]		b_pwdata,
+                        output								b_presetn,
+                        output		[DATA_WIDTH-1 : 0]		b_pwdata,
                         output	reg							b_pwrite,
                         output	reg	[BANK_NUM-1	:	0]		b_psel,
                         output	reg							b_penable,
@@ -28,7 +28,6 @@ reg	[3 : 0] counter_apb;
 
 wire en_pwrite;
 wire en_paddr;
-wire en_pwdata;
 wire en_psel;
 wire en_penable;
 
@@ -58,32 +57,33 @@ end
 
 assign miso = reg_miso[15];
 
-assign sclk = b_pclk;
-
 // apb interface
 always @(negedge sclk or negedge resetn) begin
 	if(!resetn) begin
 		b_pwrite <= 1'b0; 
 		b_paddr	 <= 7'h0;
-		b_pwdata <= 8'h0;
 		b_psel	 <= 8'h0;
 		b_penable <= 1'b0;
 	end else begin
-		b_pwrite <= (en_pwrite)? reg_mosi[0] : b_pwrite;
-		b_paddr	 <= (en_paddr)?  reg_mosi[2:0] : b_paddr;
-		b_pwdata <= (en_pwdata)? reg_mosi[7:0] : b_pwdata;
-		b_psel	 <= (en_psel)?	 reg_mosi[BANK_NUM-1:0] : b_psel; 
-		b_penable <= (en_penable)?  1'b1 : b_penable;
+		if(b_pready) begin
+			b_pwrite <= (en_pwrite)? reg_mosi[0] : b_pwrite;
+			b_paddr	 <= (en_paddr)?  reg_mosi[2:0] : b_paddr;
+			b_psel	 <= (en_psel)?	 reg_mosi[BANK_NUM-1:0] : b_psel; 
+			b_penable <= (en_penable)?  1'b1 : b_penable;
+		end else begin
+			b_psel	<= 'b0;
+			b_penable <= 1'b0;
+		end
 	end
 end
 
-
+assign 	b_pclk		= sclk;
 assign	en_pwrite	= (counter_spi == 4'h1)? 1'b1 : 1'b0;
 assign  en_paddr	= (counter_spi == 4'h8)? 1'b1 : 1'b0;
-assign	en_pwdata	= (counter_spi == 4'h0)? 1'b1 : 1'b0;
 assign  en_psel		= (counter_spi == 4'h3)? 1'b1 : 1'b0;	
-assign	en_penable	= (counter_spi == 4'hd)? 1'b1 : 1'b0;	//доделать
-assign b_resetn = resetn; 
+assign	en_penable	= (counter_spi == 4'hd)? 1'b1 : 1'b0;	
+assign  b_presetn 	= resetn; 
+assign  b_pwdata    = reg_mosi[7:0];
 
 
 endmodule
