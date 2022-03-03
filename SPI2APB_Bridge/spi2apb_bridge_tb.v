@@ -43,7 +43,7 @@ integer i;
 
                 for(i = 0; i < 16; i = i + 1) begin
                         @(posedge clk);
-                        b_pready = (i = 15)? 1'b1 : 1'b0;
+                        b_pready = (i == 15)? 1'b1 : 1'b0;
                         sclk = !sclk;
                         reg_miso_tb = reg_miso_tb << 1'b1;
                         @(posedge clk);

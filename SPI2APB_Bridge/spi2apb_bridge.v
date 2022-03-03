@@ -82,6 +82,7 @@ assign	en_pwrite	= (counter_spi == 4'h1)? 1'b1 : 1'b0;
 assign  en_paddr	= (counter_spi == 4'h8)? 1'b1 : 1'b0;
 assign  en_psel		= (counter_spi == 4'h3)? 1'b1 : 1'b0;	
 assign	en_penable	= (counter_spi == 4'hd)? 1'b1 : 1'b0;	
+
 assign  b_presetn 	= resetn; 
 assign  b_pwdata    = reg_mosi[7:0];
 
