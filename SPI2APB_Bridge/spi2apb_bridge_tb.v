@@ -10,7 +10,7 @@ module spi2apb_bridge_tb#(
 reg     clk;
 reg     sclk;
 reg     resetn;
-reg     mosi;
+wire    mosi;
 reg     ss;
 wire	miso;
 
@@ -38,27 +38,29 @@ integer i;
                 @(posedge clk);
                 ss = 0;
                 reg_mosi_tb = data_mosi;
-                mosi = reg_mosi_tb[15];
-                reg_miso_tb[0] = miso;
+                //reg_miso_tb[0] = miso;
 
                 for(i = 0; i < 16; i = i + 1) begin
                         @(posedge clk);
-                        b_pready = (i == 15)? 1'b1 : 1'b0;
                         sclk = !sclk;
-                        reg_miso_tb = reg_miso_tb << 1'b1;
+                        reg_miso_tb[0] = (i != 16)? miso : reg_miso_tb[0];
                         @(posedge clk);
+                        @(posedge clk);
+                        sclk = !sclk;
+                        reg_miso_tb = (i != 15)? reg_miso_tb << 1'b1 : reg_miso_tb;
                         reg_mosi_tb = reg_mosi_tb << 1'b1;
-                        @(posedge clk);
-                        sclk = !sclk;
-                        mosi = reg_mosi_tb[15];
-                        reg_miso_tb[0] = (i != 15)? miso : reg_miso_tb[0];
                         @(posedge clk);
                 end
                 @(posedge clk);
                 ss = 1;
+                for(i = 0; i < 16; i = i + 1) begin
+                        @(posedge clk);
+                        b_pready = (i == 14)? 1'b1 : 1'b0;
+                end
         end
 endtask
 
+assign mosi = reg_mosi_tb[15];
 
 initial begin
         clk = 0;

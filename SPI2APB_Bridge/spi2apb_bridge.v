@@ -36,14 +36,13 @@ reg en_sclk;
 //spi interface
 always @(posedge sclk or negedge resetn) begin
 	if(!resetn) begin
-		reg_miso 	<=	16'hf001;
+		reg_miso 	<=	16'hffff;
 		reg_mosi	<=	16'h0000;
         counter_spi	<=  4'b0000;
 	end else begin
 		if(!ss) begin
 		 	reg_mosi [0] 	<= mosi;
 		 	counter_spi 	<= counter_spi + 1'b1;
-		 	reg_miso		<= reg_miso << 1'b1;
 		end else 
 			counter_spi <= 4'b0000;
 	end
@@ -52,13 +51,14 @@ end
 always @(negedge sclk) begin
 	if(!ss && (counter_spi != 4'b0000)) begin
 		reg_mosi	<= reg_mosi << 1'b1;
+		reg_miso	<= reg_miso << 1'b1;
 	end
 end
 
 assign miso = reg_miso[15];
 
 // apb interface
-always @(negedge sclk or negedge resetn) begin
+always @(negedge sclk or negedge resetn or posedge b_pready) begin
 	if(!resetn) begin
 		b_pwrite <= 1'b0; 
 		b_paddr	 <= 7'h0;
@@ -66,13 +66,13 @@ always @(negedge sclk or negedge resetn) begin
 		b_penable <= 1'b0;
 	end else begin
 		if(b_pready) begin
+			b_psel	<= 'b0;
+			b_penable <= 1'b0;
+		end else begin
 			b_pwrite <= (en_pwrite)? reg_mosi[0] : b_pwrite;
 			b_paddr	 <= (en_paddr)?  reg_mosi[2:0] : b_paddr;
 			b_psel	 <= (en_psel)?	 reg_mosi[BANK_NUM-1:0] : b_psel; 
 			b_penable <= (en_penable)?  1'b1 : b_penable;
-		end else begin
-			b_psel	<= 'b0;
-			b_penable <= 1'b0;
 		end
 	end
 end
