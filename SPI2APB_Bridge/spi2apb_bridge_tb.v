@@ -10,6 +10,8 @@ module spi2apb_bridge_tb#(
 reg     clk;
 reg     sclk;
 reg     resetn;
+//reg     [DATA_WIDTH-1 : 0] b_reg1;
+//reg     [DATA_WIDTH-1 : 0] b_reg2 = 8'hf9;
 wire    mosi;
 reg     ss;
 wire	miso;
@@ -28,35 +30,69 @@ reg [15:0] reg_mosi_tb;
 reg [15:0] reg_miso_tb;
 
 spi2apb_bridge i0(      .sclk(sclk),            .resetn(resetn),        .mosi(mosi),            .miso(miso),            .ss(ss),
-                        .b_pready(b_pready),    .b_pclk(b_pclk),        .b_presetn(b_presetn),  .b_pwrite(b_write),     .b_penable(b_penable),
+                        .b_pready(b_pready),    .b_pclk(b_pclk),        .b_presetn(b_presetn),  .b_pwrite(b_pwrite),     .b_penable(b_penable),
                         .b_psel(b_psel),        .b_pwdata(b_pwdata),    .b_paddr(b_paddr),      .b_prdata(b_prdata));
 
 
-task en_trans(input [15:0] data_mosi);
+task en_trans(input [15:0] data_mosi, input [7:0] prdata);
 integer i;
+reg                        rw;
+reg     [DATA_WIDTH-1 : 0] tb_reg_pwdata;
+reg     [DATA_WIDTH-1 : 0] tb_reg_prdata;
+
         begin
+                tb_reg_pwdata = 'h0;
+                tb_reg_prdata = prdata;
+                rw = data_mosi[15];
+                reg_mosi_tb = data_mosi;
+                $display("mosi    = %h", reg_mosi_tb);
                 @(posedge clk);
                 ss = 0;
-                reg_mosi_tb = data_mosi;
                 //reg_miso_tb[0] = miso;
-
+                
                 for(i = 0; i < 16; i = i + 1) begin
                         @(posedge clk);
                         sclk = !sclk;
                         reg_miso_tb[0] = (i != 16)? miso : reg_miso_tb[0];
+                        tb_reg_pwdata = (i == 15 && rw)? b_pwdata : tb_reg_pwdata;
+                        b_prdata = (i == 7 && !rw)? tb_reg_prdata : b_prdata;
+                        if(rw && i == 15)
+                                b_pready = 1'b1;
+                        else if(!rw && i == 7)
+                               b_pready = 1'b1;
+                        else 
+                                b_pready = 1'b0;
                         @(posedge clk);
                         @(posedge clk);
                         sclk = !sclk;
                         reg_miso_tb = (i != 15)? reg_miso_tb << 1'b1 : reg_miso_tb;
-                        reg_mosi_tb = reg_mosi_tb << 1'b1;
+                        reg_mosi_tb = reg_mosi_tb << 1'b1; 
+                        if(i == 15) begin
+                                b_pready = 1'b0;
+                        end
                         @(posedge clk);
                 end
                 @(posedge clk);
                 ss = 1;
-                for(i = 0; i < 16; i = i + 1) begin
-                        @(posedge clk);
-                        b_pready = (i == 14)? 1'b1 : 1'b0;
+
+                if(rw)  begin
+                        $display($time, " ns");
+                        $display("mosi    = %h", reg_mosi_tb);
+                        $display("pwrite = %b", b_pwrite);
+                        $display("psel = %b", b_psel);
+                        $display("paddr = %b", b_paddr);
+                        $display("penable = %b", b_penable);
+                        $display("pwdata  = %h \n", b_pwdata);
+                end else begin
+                        $display($time, " ns");
+                        $display("miso = %h", reg_miso_tb);
+                        $display("pwrite = %b", b_pwrite);
+                        $display("psel = %b", b_psel);
+                        $display("paddr = %b", b_paddr);
+                        $display("penable = %b", b_penable);
+                        $display("prdata  = %h \n", b_prdata);
                 end
+
         end
 endtask
 
@@ -80,7 +116,11 @@ initial begin
         #3 resetn = 0;
         #3 resetn = 1;
         #100
-        en_trans(16'hd5f9);
+        $display("Write: \n");
+        en_trans(16'hffff,8'h00);
+        #1000
+         $display("Read: \n");
+        en_trans(16'h55f9, 8'hf9);
        /* #100
         en_trans(16'h1234);
         #100
