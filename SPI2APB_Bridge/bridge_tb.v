@@ -37,11 +37,10 @@ spi2apb_bridge i0(  .sclk(sclk),	        .resetn(resetn),        .mosi(mosi), 	 
                     .b_pwrite(tb_pwrite),    .b_psel(tb_psel),        .b_penable(tb_penable),       
                     .b_pwdata(tb_pwdata),    .b_paddr(tb_paddr),      .b_prdata(tb_prdata));
 
-apb_monitor i1(     .m_pready(tb_pready),    .m_pclk(tb_pclk_b),        .m_presetn(tb_presetn),  
+apb_monitor i1(     .m_pready(tb_pready),    .m_pclk(tb_pclk_a),        .m_presetn(tb_presetn),  
                     .m_pwrite(tb_pwrite),    .m_psel(tb_psel),        .m_penable(tb_penable),       
                     .m_pwdata(tb_pwdata),    .m_paddr(tb_paddr),      .m_prdata(tb_prdata));
 
-assign #(3) tb_pclk_b = tb_pclk_a;
 
 function automatic reg [15:0] spi_xfer;
 input [DATA_WIDTH-1:0] data_in;
@@ -65,10 +64,6 @@ integer i;
                 reg_mosi_tb [15] = 1;  
                 reg_mosi_tb [14:8] = addr;
                 reg_mosi_tb [7:0] = data;  
-              /*  $display("mosi   = %b, = %h", reg_mosi_tb, reg_mosi_tb);
-                $display("addr   = %b", addr);
-                $display("data   = %b", data);
-                */
 
                 for(i = 0; i < 16; i = i + 1) begin
                         @(posedge clk);
@@ -87,9 +82,27 @@ endtask
 
 
  
-task read_reg();
+task read_reg(input [ADDR_WIDTH-1:0] addr);
+integer i;
         begin
 
+             @(posedge clk);
+                ss = 0;
+                reg_mosi_tb [15] = 0;  
+                reg_mosi_tb [14:8] = addr;
+                reg_mosi_tb [7:0] = 'h0;  
+
+                for(i = 0; i < 16; i = i + 1) begin
+                        @(posedge clk);
+                        sclk = !sclk;
+                        reg_miso_tb = reg_miso_tb << 1;
+                        #10
+                        reg_miso_tb =  reg_miso_tb + spi_xfer(reg_mosi_tb);
+                        @(posedge clk);
+                        sclk = !sclk;
+                end
+                @(posedge clk);
+                ss = 1;
         end
 endtask
 
@@ -109,7 +122,11 @@ initial begin
         #3 resetn = 0;
         #3 resetn = 1;
         #100
-        write_reg(7'h7f, 8'hff);
+        $display("Write: ") ;
+        write_reg(7'h6c, 8'hf3);
+        #100
+        $display("Read: ") ;
+        read_reg(7'h55);
         #500 $finish;
 end
 

@@ -12,19 +12,26 @@ module apb_monitor#(
                         input		[BANK_ADDR-1	:	0]	m_psel,
                         input								m_penable,
                         input		[ADDR_WIDTH-1 : 0]		m_paddr
+
                         );
 
-
+wire en_pready;
 initial begin
+    m_pready = 1'b0;
         $display("Module %m");
-        $monitor($time, "\n pwrite=%h psel=%h, paddr=%h,pwdata=%h, penable=%h, pready=%h \n", m_pwrite, m_psel, m_paddr, m_pwdata, m_penable, m_pready);
+        $monitor($time, "\n pwrite=%h psel=%h paddr=%h pwdata=%h prdata=%h penable=%h pready=%h \n", m_pwrite, m_psel, m_paddr, m_pwdata, m_prdata, m_penable, m_pready);
 end
 
-always @(posedge m_pclk) begin
-	if(m_penable)
-		m_pready <= 1'b1;
-	else
-		m_pready <= 1'b0;
+always @(*) begin
+    if(m_penable) begin
+        m_pready = 1'b1;
+        #40
+        m_pready = 1'b0;  
+    end 
 end 
+
+assign m_prdata = (m_penable & !m_pwrite)? 8'hf9 : 'h0;
+
+//assign en_pready = m_psel & m_penable;
 
 endmodule
