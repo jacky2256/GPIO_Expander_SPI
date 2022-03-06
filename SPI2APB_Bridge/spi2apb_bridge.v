@@ -31,9 +31,13 @@ wire en_paddr;
 wire en_psel;
 wire en_penable_w;
 wire en_penable_r;
+wire en_psel_w;
+wire en_psel_r;
+reg off_signal;
 reg en_pwdata;
 reg en_sclk;
 reg off_penable;
+
 //spi interface
 always @(posedge sclk or negedge resetn) begin
 	if(!resetn) begin
@@ -86,10 +90,6 @@ always @(posedge sclk or negedge resetn or negedge b_pready) begin
 		end
 	end
 end
-
- reg off_signal;
- wire en_psel_w;
- wire en_psel_r;
 
 
 always @(posedge sclk or negedge resetn or posedge b_pready) begin
