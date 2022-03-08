@@ -8,8 +8,8 @@ module bridge_tb#(
                  	parameter PDATA_WIDTH 	=  	8,
 					parameter ADDR_WIDTH	=	7,
                   	parameter PADDR_WIDTH   = 	3
-				)(
-				);
+				    )(
+				    );
 reg     clk;
 reg     sclk;
 reg     resetn;
