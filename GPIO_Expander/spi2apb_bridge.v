@@ -41,7 +41,6 @@ reg off_penable;
 //spi interface
 always @(posedge sclk or negedge resetn) begin
 	if(!resetn) begin
-		reg_miso 	<=	'h0;
 		reg_mosi	<=	'h0;
         counter_spi	<=  'b00;
 	end else begin
@@ -53,10 +52,14 @@ always @(posedge sclk or negedge resetn) begin
 	end
 end
 
-always @(negedge sclk) begin
-	if(!ss && (counter_spi != 4'b0000)) begin
+always @(negedge sclk or negedge resetn) begin
+	if(!resetn) begin
+		reg_miso 	<=	'h0;
+	end else begin
+		if(!ss && (counter_spi != 4'b0000)) begin
 		reg_mosi	<= reg_mosi << 1'b1;
 		reg_miso	<= reg_miso << 1'b1;
+		end
 	end
 end
 
@@ -117,7 +120,7 @@ assign  b_presetn 	= resetn;
 assign  b_pwdata    = reg_mosi[7:0];
 
 
-always @(negedge sclk or negedge resetn) begin
+always @(negedge sclk) begin
 	if(!b_pwrite && b_penable)
 		reg_miso [15:8] <= b_prdata; 
 end

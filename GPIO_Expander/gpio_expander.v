@@ -10,7 +10,7 @@ module gpio_expander#(
 						)(
 						input	sclk,
 						input	resetn,
-						input	miso,
+						output	miso,
 						input	mosi,
 						input	ss,
 						
@@ -18,7 +18,7 @@ module gpio_expander#(
 
 wire 						e_pclk_a 	;
 wire 						e_pclk_b 	;
-
+wire						miso_a		;
 wire 						e_presetn  	;
 wire	[PADDR_WIDTH-1:0]	e_paddr  	;
 wire 						e_pwrite  	;
@@ -40,7 +40,7 @@ assign #(0) e_pclk_b = e_pclk_a;
 spi2apb_bridge bridge(	.sclk(sclk),		.resetn(resetn),		.b_pready(e_pready),	.b_prdata(e_prdata),	
 						.b_pclk(e_pclk_a),	.b_presetn(e_presetn), 	.b_paddr(e_paddr),		.b_pwrite(e_pwrite),	
 						.b_psel(e_psel),	.b_penable(e_penable),	.b_pwdata(e_pwdata),						
-						.mosi(mosi), 		.miso(miso),			.ss(ss));
+						.mosi(mosi), 		.miso(miso_a),			.ss(ss));
 
 gbas 			bank0(	.paddr(e_paddr),	.pready(e_pready),		.prdata(e_prdata),	
 						.pclk(e_pclk_b),	.pwdata(e_pwdata),		.pwrite(e_pwrite),

@@ -16,17 +16,17 @@ module gpio_expander_tb#(
 reg clk;
 reg	sclk;
 reg	resetn;
-reg	miso;
-wire	mosi;
+wire	miso_tb;
+wire    mosi_tb;
 reg	ss;
 						
-wire [7:0]	pad;
+wire [7:0]	pad_tb;
 
 reg [15:0] reg_mosi_tb;
 reg [15:0] reg_miso_tb;
 
 
-gpio_expander bridge(.sclk(sclk), .resetn(resetn), .miso(miso), .mosi(mosi), .ss(ss), .pad(pad));
+gpio_expander bridge(.sclk(sclk), .resetn(resetn), .miso(miso_tb), .mosi(mosi_tb), .ss(ss), .pad(pad_tb));
 //gbas bank();
 //gpio_pad pins();
 
@@ -36,7 +36,7 @@ reg 	[15:0] 				rd_mosi;
         begin
                 reg_mosi_tb = data_in << 1;
                 rd_mosi[15:1] = 'h0;
-                rd_mosi[0] = miso;
+                rd_mosi[0] = miso_tb;
                 spi_xfer = rd_mosi;
         end
 endfunction
@@ -108,11 +108,11 @@ initial begin
         #3 resetn = 0;
         #3 resetn = 1;
         #100
-        $display("Write: ") ;
-        write_reg(7'h20, 8'h81);
-        #100
+       // $display("Write: ") ;
+        //write_reg(7'h20, 8'h81);
+        //#100
         $display("Read: ") ;
-        read_reg(7'h55);
+        read_reg(7'h20);
         #500 $finish;
 end
 
