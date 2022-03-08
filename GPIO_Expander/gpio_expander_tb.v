@@ -26,7 +26,7 @@ reg [15:0] reg_mosi_tb;
 reg [15:0] reg_miso_tb;
 
 
-gpio_expander bridge(.sclk(sclk), .resetn(resetn), .miso(miso_tb), .mosi(mosi_tb), .ss(ss), .pad(pad_tb));
+gpio_expander i0(.sclk(sclk), .resetn(resetn), .miso(miso_tb), .mosi(mosi_tb), .ss(ss), .pad(pad_tb));
 //gbas bank();
 //gpio_pad pins();
 
