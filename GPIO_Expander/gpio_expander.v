@@ -34,7 +34,7 @@ wire [7:0]	e_pd;
 wire [7:0]	e_a;
 wire [7:0]	e_y;
 
-assign #(0) e_pclk_b = e_pclk_a;
+assign e_pclk_b = e_pclk_a;
 
 spi2apb_bridge bridge(	.sclk(sclk),		.resetn(resetn),		.b_pready(e_pready),	.b_prdata(e_prdata),	
 						.b_pclk(e_pclk_a),	.b_presetn(e_presetn), 	.b_paddr(e_paddr),		.b_pwrite(e_pwrite),	
@@ -43,12 +43,12 @@ spi2apb_bridge bridge(	.sclk(sclk),		.resetn(resetn),		.b_pready(e_pready),	.b_p
 
 gbas 			bank0(	.paddr(e_paddr),	.pready(e_pready),		.prdata(e_prdata),	
 						.pclk(e_pclk_b),	.pwdata(e_pwdata),		.pwrite(e_pwrite),
-						.pselx(e_psel),		.penable(e_penable),	.presetn(e_presetn));
-
+						.pselx(e_psel[0]),		.penable(e_penable),	.presetn(e_presetn));
+/*
 gbas 			bank1(	.paddr(e_paddr),	.pready(e_pready),		.prdata(e_prdata),	
 						.pclk(e_pclk),	 	.pwdata(e_pwdata),		.pwrite(e_pwrite),
-						.pselx(e_psel),		.penable(e_penable),	.presetn(e_presetn));
-
+						.pselx(e_psel[1]),		.penable(e_penable),	.presetn(e_presetn));
+*/
 
 gpio_pad 		pin0(	.oe(e_oe[0]),		.a(e_a[0]),				.pd(e_pd[0]),
 						.pu(e_pu[0]),		.y(e_y[0]),				.pad(pad[0]));

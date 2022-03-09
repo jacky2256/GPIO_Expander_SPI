@@ -1,14 +1,13 @@
  module gbas#(
- 				parameter ADDR_BUNK 	= 1,
-				parameter DATA_WIDTH 	= 8,
-				parameter ADDR_WIDTH 	= 3,
-				parameter PREADY_DEL 	= 0
+				parameter DATA_WIDTH = 8,
+				parameter ADDR_WIDTH = 3,
+				parameter PREADY_DEL = 0
 				)(
 				input 							pclk,
 				input 							presetn,
 				input 		[ADDR_WIDTH-1 : 0]	paddr,
 				input 							pwrite,
-				input 		[1:0]					pselx,
+				input 							pselx,
 				input 							penable,
 				input 		[DATA_WIDTH-1 : 0]	pwdata,
 				output  reg	[DATA_WIDTH-1 : 0]	prdata,
@@ -20,12 +19,6 @@
 				output		[7 : 0]            	pd,
 				output		[7 : 0]            	a
 				);
-
-reg [1:0] addr_bank = ADDR_BUNK;
-wire sel_bank;
-reg pwrite_reg;
-
-assign sel_bank = (pselx == addr_bank)? 1'b1 : 1'b0;
 
 reg [7:0] reg_oe;
 reg [7:0] reg_pu;
@@ -42,8 +35,8 @@ reg 			 pready_reg;
 wire 			 write_en;
 wire 			 read_en;
 
-assign write_en = 	 pwrite & sel_bank;
-assign read_en	=	!pwrite & sel_bank;
+assign write_en = 	 pwrite & pselx;
+assign read_en	=	!pwrite & pselx;
 
 always @(posedge pclk or negedge presetn) begin
 	if(!presetn) begin
@@ -55,10 +48,10 @@ always @(posedge pclk or negedge presetn) begin
 	else begin
 		if(write_en & pready) begin
 			case (paddr)
-				3'h0 : reg_oe	<= pwdata;
-				3'h1 : reg_pu	<= pwdata;
-				3'h2 : reg_pd	<= pwdata;
-				3'h3 : reg_a 	<= pwdata;
+				8'h00 : reg_oe	<= pwdata;
+				8'h01 : reg_pu	<= pwdata;
+				8'h02 : reg_pd	<= pwdata;
+				8'h03 : reg_a 	<= pwdata;
 			endcase
 		end
 	end
@@ -67,11 +60,11 @@ end
 always @(*) begin
 	if(read_en & penable & pready) begin
 		case (paddr)
-			3'h0 : prdata <= reg_oe;
-			3'h1 : prdata <= reg_pu;
-			3'h2 : prdata <= reg_pd;
-			3'h3 : prdata <= reg_a;
-			3'h4 : prdata <= reg_y;
+			8'h00 : prdata <= reg_oe;
+			8'h01 : prdata <= reg_pu;
+			8'h02 : prdata <= reg_pd;
+			8'h03 : prdata <= reg_a;
+			8'h04 : prdata <= reg_y;
 			default : prdata <= 8'h00;
 		endcase
 	end else 
@@ -98,7 +91,6 @@ always @(posedge pclk or  negedge presetn) begin
 		reg_y <= y;
 end
 
-
 assign pready = ((read_en && penable) || (write_en && penable))? pready_reg : 1'b0;
 
 assign oe = reg_oe;
@@ -107,3 +99,4 @@ assign pd = reg_pd;
 assign a  = reg_a;
 
 endmodule
+
