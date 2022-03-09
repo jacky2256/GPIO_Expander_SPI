@@ -38,23 +38,13 @@ wire 			 read_en;
 assign write_en = 	 pwrite & pselx;
 assign read_en	=	!pwrite & pselx;
 
-always @(posedge pclk or negedge presetn) begin
+always @(negedge presetn) begin
 	if(!presetn) begin
 		reg_oe	<= 8'h00;
 		reg_pd	<= 8'h00;
 		reg_pu	<= 8'h00;
 		reg_a	<= 8'h00;
 	end 
-	else begin
-		if(write_en & pready) begin
-			case (paddr)
-				8'h00 : reg_oe	<= pwdata;
-				8'h01 : reg_pu	<= pwdata;
-				8'h02 : reg_pd	<= pwdata;
-				8'h03 : reg_a 	<= pwdata;
-			endcase
-		end
-	end
 end
 
 always @(*) begin
@@ -66,6 +56,13 @@ always @(*) begin
 			8'h03 : prdata <= reg_a;
 			8'h04 : prdata <= reg_y;
 			default : prdata <= 8'h00;
+		endcase
+	end else if(write_en & pready & penable) begin
+		case (paddr)
+			8'h00 : reg_oe	<= pwdata;
+			8'h01 : reg_pu	<= pwdata;
+			8'h02 : reg_pd	<= pwdata;
+			8'h03 : reg_a 	<= pwdata;
 		endcase
 	end else 
 		prdata <= 8'h00;
@@ -91,7 +88,9 @@ always @(posedge pclk or  negedge presetn) begin
 		reg_y <= y;
 end
 
-assign pready = ((read_en && penable) || (write_en && penable))? pready_reg : 1'b0;
+assign pready = (read_en && penable)? pready_reg : (write_en && penable)? (pselx & penable) : 1'b0;
+
+assign pready = pselx & penable;
 
 assign oe = reg_oe;
 assign pu = reg_pu;
