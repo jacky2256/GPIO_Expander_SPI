@@ -20,7 +20,7 @@ wire	miso_tb;
 wire    mosi_tb;
 reg	ss;
 						
-wire [7:0]	pad_tb;
+wire [15:0]	pad_tb;
 
 reg [15:0] reg_mosi_tb;
 reg [15:0] reg_miso_tb;
@@ -109,7 +109,9 @@ initial begin
         #3 resetn = 1;
         #100
         $display("Write: ") ;
-        write_reg(7'h20, 8'h81);
+        write_reg(7'h20, 8'hff);
+        #100
+        write_reg(7'h40, 8'hff);
         #100
         $display("Read: ") ;
         read_reg(7'h20);
