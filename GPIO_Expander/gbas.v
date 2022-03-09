@@ -40,29 +40,29 @@ assign read_en	=	!pwrite & pselx;
 
 always @(negedge presetn) begin
 	if(!presetn) begin
-		reg_oe	<= 8'h00;
-		reg_pd	<= 8'h00;
-		reg_pu	<= 8'h00;
-		reg_a	<= 8'h00;
+		reg_oe	<= 'h0;
+		reg_pd	<= 'h0;
+		reg_pu	<= 'h0;
+		reg_a	<= 'h0;
 	end 
 end
 
 always @(*) begin
 	if(read_en & penable & pready) begin
 		case (paddr)
-			8'h00 : prdata <= reg_oe;
-			8'h01 : prdata <= reg_pu;
-			8'h02 : prdata <= reg_pd;
-			8'h03 : prdata <= reg_a;
-			8'h04 : prdata <= reg_y;
+			3'h0 : prdata <= reg_oe;
+			3'h1 : prdata <= reg_pu;
+			3'h2 : prdata <= reg_pd;
+			3'h3 : prdata <= reg_a;
+			3'h4 : prdata <= reg_y;
 			default : prdata <= 8'h00;
 		endcase
 	end else if(write_en & pready & penable) begin
 		case (paddr)
-			8'h00 : reg_oe	<= pwdata;
-			8'h01 : reg_pu	<= pwdata;
-			8'h02 : reg_pd	<= pwdata;
-			8'h03 : reg_a 	<= pwdata;
+			3'h0 : reg_oe	<= pwdata;
+			3'h1 : reg_pu	<= pwdata;
+			3'h2 : reg_pd	<= pwdata;
+			3'h3 : reg_a 	<= pwdata;
 		endcase
 	end else 
 		prdata <= 8'h00;

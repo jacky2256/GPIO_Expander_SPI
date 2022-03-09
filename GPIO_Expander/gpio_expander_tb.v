@@ -24,11 +24,10 @@ wire [15:0]	pad_tb;
 
 reg [15:0] reg_mosi_tb;
 reg [15:0] reg_miso_tb;
-
+reg [15:0] reg_pad;
 
 gpio_expander i0(.sclk(sclk), .resetn(resetn), .miso(miso_tb), .mosi(mosi_tb), .ss(ss), .pad(pad_tb));
-//gbas bank();
-//gpio_pad pins();
+
 
 function automatic reg [15:0] spi_xfer;
 input 	[DATA_WIDTH-1:0] 	data_in;
@@ -101,6 +100,13 @@ initial begin
         reg_miso_tb = 16'h0000;
 end
 
+integer i;
+integer j;
+integer k;
+integer z;
+reg [7:0] data = 'h0;
+
+
 initial begin
         $dumpfile("gpio_expander_tb.vcd");
         $dumpvars(0, gpio_expander_tb);
@@ -108,13 +114,34 @@ initial begin
         #3 resetn = 0;
         #3 resetn = 1;
         #100
-        $display("Write: ") ;
-        write_reg(7'h20, 8'hff);
-        #100
+         $display("Write: ") ;
+        for(i = 0; i < 256; i = i+1) begin
+            for(j = 0; j < 256; j = j + 1) begin
+                for(k = 0; k < 256; k = k + 1) begin
+                    for(z = 0; z < 256; z = z + 1) begin
+                        write_reg(7'h38, data);
+                        data = data + 1'b1;
+                        #100;
+                    end
+                    write_reg(7'h28, data);
+                    data = data + 1'b1;
+                    #100;
+                end
+                write_reg(7'h24, data);
+                data = data + 1'b1;
+                #100;
+            end
+            write_reg(7'h20, data);
+            data = data + 1'b1;
+            #100;
+        end
+
+
+        /*
         write_reg(7'h40, 8'hff);
         #100
         $display("Read: ") ;
-        read_reg(7'h20);
+        read_reg(7'h20);*/
         #500 $finish;
 end
 
