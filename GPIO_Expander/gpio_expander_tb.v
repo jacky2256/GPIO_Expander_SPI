@@ -42,7 +42,7 @@ reg 	[15:0] 				rd_mosi;
 endfunction
 
 
-assign mosi = reg_mosi_tb[15];
+assign mosi_tb = reg_mosi_tb[15];
 
 task write_reg(input [ADDR_WIDTH-1:0] addr, input [PDATA_WIDTH-1:0] data);
 integer i;
@@ -108,9 +108,9 @@ initial begin
         #3 resetn = 0;
         #3 resetn = 1;
         #100
-       // $display("Write: ") ;
-        //write_reg(7'h20, 8'h81);
-        //#100
+        $display("Write: ") ;
+        write_reg(7'h20, 8'h81);
+        #100
         $display("Read: ") ;
         read_reg(7'h20);
         #500 $finish;
