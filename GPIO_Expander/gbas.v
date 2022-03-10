@@ -28,7 +28,7 @@ reg		[7:0]		reg_y;
 
 
 reg		[1:0]		counter;
-wire 	[7:0]		wire_y;
+wire	[7:0]		wire_y;
 wire				r_counter_en;
 wire				w_counter_en;
 wire				write_en;
