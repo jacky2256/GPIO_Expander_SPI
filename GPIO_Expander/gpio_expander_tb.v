@@ -36,107 +36,94 @@ gpio_expander i0(.sclk(sclk), .resetn(resetn), .miso(miso_tb[0]), .mosi(mosi_tb[
 gpio_expander i1(.sclk(sclk), .resetn(resetn), .miso(miso_tb[1]), .mosi(mosi_tb[1]), .ss(ss[1]), .pad(pad_tb[1]));
 
 
-function automatic reg [15:0] spi_xfer_ndrive;
-input 	[DATA_WIDTH-1:0] 	data_in;
-reg 	[15:0] 				rd_mosi;
+task spi_xfer_ndrive(input [DATA_WIDTH-1:0] data_in, output reg [DATA_WIDTH-1:0] data_out);
         begin
-                reg_mosi_tb[0] = data_in << 1;
-                rd_mosi[15:1] = 'h0;
-                rd_mosi = miso_tb[0];
-                spi_xfer_ndrive = rd_mosi;
-        end
-endfunction
+                data_out = 'h0;
+                reg_mosi_tb[0] = data_in;
 
-function automatic reg [15:0] spi_xfer_wdrive;
-input   [DATA_WIDTH-1:0]    data_in;
-reg     [15:0]              rd_mosi;
-        begin
-                reg_mosi_tb[1] = data_in << 1;
-                rd_mosi[15:1] = 'h0;
-                rd_mosi = miso_tb[1];
-                spi_xfer_wdrive = rd_mosi;
+                for(i = 0; i < 16; i = i + 1) begin
+                        @(posedge clk);
+                        sclk = !sclk;
+                        data_out[0] = miso_tb[0];
+                        @(posedge clk);
+                        reg_mosi_tb[0] = reg_mosi_tb[0] << 1;
+                        data_out = (i == 15)? data_out :data_out << 1;
+                        sclk = !sclk;
+                end
         end
-endfunction
+endtask
+
+task spi_xfer_wdrive(input [DATA_WIDTH-1:0] data_in, output reg [DATA_WIDTH-1:0] data_out);
+        begin
+                data_out = 'h0;
+                reg_mosi_tb[1] = data_in;
+
+                for(i = 0; i < 16; i = i + 1) begin
+                        @(posedge clk);
+                        sclk = !sclk;
+                        data_out[0] = miso_tb[1];
+                        @(posedge clk);
+                        reg_mosi_tb[1] = reg_mosi_tb[1] << 1;
+                        data_out = (i == 15)? data_out :data_out << 1;
+                        sclk = !sclk;
+                end
+        end
+endtask
 
 
 assign mosi_tb[0] = reg_mosi_tb[0][15];
 assign mosi_tb[1] = reg_mosi_tb[1][15];
 
 task write_reg(input [1:0] sel, input [2:0] addr, input [PDATA_WIDTH-1:0] data);
-integer i;
         begin
-
-             @(posedge clk);
-                ss[0] = 0;
                 reg_mosi_tb [0][15] = 1;  
                 reg_mosi_tb [0][14:13] = sel;
                 reg_mosi_tb [0][12:10] = addr;
                 reg_mosi_tb [0][9:8] = 'h0;
-                reg_mosi_tb [0][7:0] = data;   
-
-                for(i = 0; i < 16; i = i + 1) begin
-                        @(posedge clk);
-                        sclk = !sclk;
-                        reg_miso_tb[0] = reg_miso_tb[0] << 1;
-                        #10
-                        reg_miso_tb[0] =  reg_miso_tb[0] + spi_xfer_ndrive(reg_mosi_tb[0]);
-                        @(posedge clk);
-                        sclk = !sclk;
-                end
+                reg_mosi_tb [0][7:0] = data;
                 @(posedge clk);
-                ss[0] = 1;
+                ss[0] = 0;
+                spi_xfer_ndrive(reg_mosi_tb[0], reg_miso_tb[0]); 
+                @(posedge clk);
+                @(posedge clk);
+                ss[0] = 1; 
         end
 endtask
 
 task read_reg(input [1:0] sel, input [2:0] addr);
-integer i;
         begin
-
-             @(posedge clk);
-                ss[0] = 0;
                 reg_mosi_tb [0][15] = 0;  
                 reg_mosi_tb [0][14:13] = sel;
                 reg_mosi_tb [0][12:10] = addr;
                 reg_mosi_tb [0][9:8] = 'h0;
-                reg_mosi_tb [0][7:0] = 'h0;  
-
-                for(i = 0; i < 16; i = i + 1) begin
-                        @(posedge clk);
-                        sclk = !sclk;
-                        reg_miso_tb[0] = reg_miso_tb[0] << 1;
-                        #10
-                        reg_miso_tb[0] =  reg_miso_tb[0] + spi_xfer_ndrive(reg_mosi_tb[0]);
-                        @(posedge clk);
-                        sclk = !sclk;
-                end
+                reg_mosi_tb [0][7:0] = 'h0;
                 @(posedge clk);
-                ss[0] = 1;
+                ss[0] = 0; 
+                spi_xfer_ndrive(reg_mosi_tb[0], reg_miso_tb[0]); 
+                @(posedge clk);
+                @(posedge clk);
+                ss[0] = 1;  
         end
 endtask
 
 task read_with_driver(input [1:0] sel, input [2:0] addr, input [15:0] y);
     begin
         @(posedge clk);
-                ss[1] = 0;
-                reg_mosi_tb [1][15] = 0;  
-                reg_mosi_tb [1][14:13] = sel;
-                reg_mosi_tb [1][12:10] = addr;
-                reg_mosi_tb [1][9:8] = sel;
-                reg_mosi_tb [1][7:0] = 'h0;  
 
                 pad_tb_i = y;
 
-                for(i = 0; i < 16; i = i + 1) begin
-                        @(posedge clk);
-                        sclk = !sclk;
-                        reg_miso_tb[1] = reg_miso_tb[1] << 1;
-                        #10
-                        reg_miso_tb[1] =  reg_miso_tb[1] + spi_xfer_wdrive(reg_mosi_tb[1]);
-                        @(posedge clk);
-                        sclk = !sclk;
-                end
+                ss[0] = 0;
+                reg_mosi_tb [1][15] = 0;  
+                reg_mosi_tb [1][14:13] = sel;
+                reg_mosi_tb [1][12:10] = addr;
+                reg_mosi_tb [1][9:8] = 'h0;
+                reg_mosi_tb [1][7:0] = 'h0;
                 @(posedge clk);
-                ss[1] = 1;
+                ss[1] = 0;
+                spi_xfer_wdrive(reg_mosi_tb[1], reg_miso_tb[1]); 
+                @(posedge clk);
+                @(posedge clk);
+                ss[1] = 1;  
     end
 endtask
 
@@ -153,9 +140,7 @@ initial begin
 end
 
 integer i;
-
-reg [7:0] data = 'h0;
-
+ 
 
 initial begin
         $dumpfile("gpio_expander_tb.vcd");
@@ -166,17 +151,20 @@ initial begin
         #100
         $display("Write no driver: ");
         write_reg(2'b01, 3'b000, 8'hff);
+        $display("pad = %h ", pad_tb[0]);
         write_reg(2'b10, 3'b000, 8'hff);
         $display("pad = %h ", pad_tb[0]);
-
+        
         $display("Read no driver: ");
         read_reg(2'b01, 3'b000);
         $display("reg_miso = %h ", reg_miso_tb[0]);
-
+        read_reg(2'b10, 3'b000);
+        $display("reg_miso = %h ", reg_miso_tb[0]);
+        /*
         $display("Read with driver: ");
         read_with_driver(2'b01, 3'b100, 16'hffff);
         $display("reg_miso = %h ", reg_miso_tb[1]);
-
+        */
         #500 $finish;
 end
 
