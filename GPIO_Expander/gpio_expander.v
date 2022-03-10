@@ -16,11 +16,11 @@ module gpio_expander#(
 						
 						output [15:0]	pad );
 
-wire 						e_pclk	;
+wire 						e_pclk		;	
 wire 						e_presetn  	;
 wire	[PADDR_WIDTH-1:0]	e_paddr  	;
 wire 						e_pwrite  	;
-wire 	[1:0]	 			e_psel 	 	;
+wire 	[BANK_NUM-1:0]	 	e_psel 	 	;
 wire 						e_penable  	;
 wire 	[DATA_WIDTH-1:0] 	e_pwdata	;
 reg 						e_pready  	;
@@ -30,7 +30,7 @@ reg 	[DATA_WIDTH-1:0] 	e_prdata  	;
 reg 	[1:0]				d_penable  	;
 wire 	[1:0]				d_pready  	;
 wire 	[DATA_WIDTH-1:0]	d_prdata [1:0] ;
-reg		[1:0]				d_psel;
+reg		[BANK_NUM-1:0]		d_psel;
 
 wire [15:0] e_oe;
 wire [15:0]	e_pu;
@@ -58,10 +58,10 @@ always @(*) begin
 						d_penable[1] <=	e_penable;
 					end
 			default : begin
-						d_psel	 	<= 1'b0;
-						d_penable <=	1'b0;
-						e_prdata 	<= 8'h0;
-						e_pready	<= 1'b0;
+						d_psel	 	<= 	'b0;
+						d_penable	<=	'b0;
+						e_prdata 	<= 	'h0;
+						e_pready	<= 	'b0;
 					end
 		endcase
 	end
