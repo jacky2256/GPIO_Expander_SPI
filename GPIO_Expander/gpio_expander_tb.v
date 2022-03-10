@@ -1,7 +1,4 @@
 `timescale 1ns/1ps
-//`include "gpio_pad.v"
-//`include "gbas.v"
-//`include "spi2apb_bridge.v"
 `include "gpio_expander.v"
 
 module gpio_expander_tb#(
