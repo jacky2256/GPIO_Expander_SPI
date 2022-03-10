@@ -5,13 +5,13 @@
 `include "gpio_expander.v"
 
 module gpio_expander_tb#(
-                            parameter BANK_NUM      = 	2,
-                            parameter DATA_WIDTH 	= 	16,
-                            parameter PDATA_WIDTH 	=  	8,
-                            parameter ADDR_WIDTH	=	7,
-                            parameter PADDR_WIDTH   = 	3
-                            				    		)(
-                            				    		);
+                            parameter BANK_NUM      =   2,
+                            parameter DATA_WIDTH    =   16,
+                            parameter PDATA_WIDTH   =   8,
+                            parameter ADDR_WIDTH    =   7,
+                            parameter PADDR_WIDTH   =   3
+                            )(
+                            );
 
 reg clk;
 reg	sclk;
