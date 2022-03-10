@@ -1,2 +1,8 @@
 gpio_expander_tb.vcd
 gpio_expander_tb.vvp
+gbas_tb.vcd
+gbas_tb.vvp
+gpio_pad_tb.vcd
+gpio_pad_tb.vvp
+spi2apb_bridge_tb.vcd
+spi2apb_bridge_tb.vvp
