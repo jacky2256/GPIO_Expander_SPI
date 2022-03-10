@@ -28,7 +28,8 @@ reg [15:0] reg_pad;
 
 reg [15:0] pad_tb_i; 
 
-
+integer i;
+ 
 assign (strong0, strong1) pad_tb[1] = pad_tb_i;
 
 gpio_expander i0(.sclk(sclk), .resetn(resetn), .miso(miso_tb[0]), .mosi(mosi_tb[0]), .ss(ss[0]), .pad(pad_tb[0]));
@@ -87,6 +88,7 @@ task write_reg(input [1:0] sel, input [2:0] addr, input [PDATA_WIDTH-1:0] data);
                 @(posedge clk);
                 @(posedge clk);
                 ss[0] = 1; 
+                $display("pad = %h ", pad_tb[0]);
         end
 endtask
 
@@ -103,16 +105,36 @@ task read_reg(input [1:0] sel, input [2:0] addr);
                 @(posedge clk);
                 @(posedge clk);
                 ss[0] = 1;  
+                $display("reg_miso = %h ", reg_miso_tb[0]);
         end
 endtask
 
-task read_with_driver(input [1:0] sel, input [2:0] addr, input [15:0] y);
+task write_with_driver(input [1:0] sel, input [2:0] addr, input [DATA_WIDTH-1:0] data, input [PDATA_WIDTH-1:0] y);
+        begin
+                pad_tb_i = y;
+
+                reg_mosi_tb [1][15] = 1;  
+                reg_mosi_tb [1][14:13] = sel;
+                reg_mosi_tb [1][12:10] = addr;
+                reg_mosi_tb [1][9:8] = 'h0;
+                reg_mosi_tb [1][7:0] = data;
+                @(posedge clk);
+                ss[1] = 0;
+                spi_xfer_wdrive(reg_mosi_tb[1], reg_miso_tb[1]); 
+                @(posedge clk);
+                @(posedge clk);
+                ss[1] = 1; 
+                $display("pad = %h ", pad_tb[1]);
+        end
+endtask
+
+task read_with_driver(input [1:0] sel, input [2:0] addr, input [PDATA_WIDTH-1:0] y);
     begin
         @(posedge clk);
 
                 pad_tb_i = y;
 
-                ss[0] = 0;
+                ss[1] = 0;
                 reg_mosi_tb [1][15] = 0;  
                 reg_mosi_tb [1][14:13] = sel;
                 reg_mosi_tb [1][12:10] = addr;
@@ -123,15 +145,17 @@ task read_with_driver(input [1:0] sel, input [2:0] addr, input [15:0] y);
                 spi_xfer_wdrive(reg_mosi_tb[1], reg_miso_tb[1]); 
                 @(posedge clk);
                 @(posedge clk);
-                ss[1] = 1;  
+                ss[1] = 1;
+                $display("reg_miso = %h ", reg_miso_tb[1]);  
     end
 endtask
+
 
 initial begin
         clk = 0;
         sclk = 0;
         resetn = 1;
-        ss[1:0] = 1;
+        ss = 2'b11;
         reg_mosi_tb[0] = 16'h0000;
         reg_miso_tb[0] = 16'h0000;
         reg_mosi_tb[1] = 16'h0000;
@@ -139,8 +163,6 @@ initial begin
         pad_tb_i = 'h0;
 end
 
-integer i;
- 
 
 initial begin
         $dumpfile("gpio_expander_tb.vcd");
@@ -149,22 +171,23 @@ initial begin
         #3 resetn = 0;
         #3 resetn = 1;
         #100
-        $display("Write no driver: ");
-        write_reg(2'b01, 3'b000, 8'hff);
-        $display("pad = %h ", pad_tb[0]);
-        write_reg(2'b10, 3'b000, 8'hff);
-        $display("pad = %h ", pad_tb[0]);
         
-        $display("Read no driver: ");
+        $display("\nWrite no driver: \n");
+        write_reg(2'b01, 3'b000, 8'hff);
+        write_reg(2'b10, 3'b000, 8'hff);
+        
+        $display("\nRead no driver: \n");
         read_reg(2'b01, 3'b000);
-        $display("reg_miso = %h ", reg_miso_tb[0]);
         read_reg(2'b10, 3'b000);
-        $display("reg_miso = %h ", reg_miso_tb[0]);
-        /*
-        $display("Read with driver: ");
-        read_with_driver(2'b01, 3'b100, 16'hffff);
-        $display("reg_miso = %h ", reg_miso_tb[1]);
-        */
+        
+        $display("\nWrite with driver: \n");
+        write_with_driver(2'b01, 3'b000, 8'hff, 16'h00ff);
+        write_with_driver(2'b10, 3'b000, 8'hff, 16'h00ff);
+        
+        $display("\nRead with driver: \n");
+        read_with_driver(2'b01, 3'b000, 16'h00ff);
+        read_with_driver(2'b10, 3'b000, 16'h00ff);
+        
         #500 $finish;
 end
 
