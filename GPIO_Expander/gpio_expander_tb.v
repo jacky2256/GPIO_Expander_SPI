@@ -35,7 +35,7 @@ assign pad_tb[3] = (en_driver)? pad_tb[1] : pad_tb[0];
 gpio_expander i0(.sclk(sclk), .resetn(resetn), .miso(miso_tb), .mosi(mosi_tb), .ss(ss), .pad(pad_tb[3]));
 
 
-task spi_xfer_ndrive(input [DATA_WIDTH-1:0] data_in, output reg [DATA_WIDTH-1:0] data_out);
+task spi_xfer(input [DATA_WIDTH-1:0] data_in, output reg [DATA_WIDTH-1:0] data_out);
         begin
                 data_out = 'h0;
                 reg_mosi_tb[0] = data_in;
@@ -64,7 +64,7 @@ task write_reg(input [1:0] sel, input [2:0] addr, input [PDATA_WIDTH-1:0] data);
                 reg_mosi_tb[7:0] = data;
                 @(posedge clk);
                 ss = 0;
-                spi_xfer_ndrive(reg_mosi_tb, reg_miso_tb); 
+                spi_xfer(reg_mosi_tb, reg_miso_tb); 
                 @(posedge clk);
                 @(posedge clk);
                 ss = 1; 
@@ -82,7 +82,7 @@ task read_reg(input [1:0] sel, input [2:0] addr);
                 reg_mosi_tb[7:0] = 'h0;
                 @(posedge clk);
                 ss = 0; 
-                spi_xfer_ndrive(reg_mosi_tb, reg_miso_tb); 
+                spi_xfer(reg_mosi_tb, reg_miso_tb); 
                 @(posedge clk);
                 @(posedge clk);
                 ss = 1;  
@@ -102,7 +102,7 @@ task write_with_driver(input [1:0] sel, input [2:0] addr, input [DATA_WIDTH-1:0]
                 reg_mosi_tb[7:0] = data;
                 @(posedge clk);
                 ss = 0;
-                spi_xfer_ndrive(reg_mosi_tb, reg_miso_tb); 
+                spi_xfer(reg_mosi_tb, reg_miso_tb); 
                 @(posedge clk);
                 @(posedge clk);
                 ss = 1; 
@@ -124,7 +124,7 @@ task read_with_driver(input [1:0] sel, input [2:0] addr, input [PDATA_WIDTH-1:0]
                 reg_mosi_tb[7:0] = 'h0;
                 @(posedge clk);
                 ss = 0;
-                spi_xfer_ndrive(reg_mosi_tb, reg_miso_tb); 
+                spi_xfer(reg_mosi_tb, reg_miso_tb); 
                 @(posedge clk);
                 @(posedge clk);
                 ss = 1;
