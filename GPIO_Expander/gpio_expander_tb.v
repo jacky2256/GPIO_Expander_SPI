@@ -90,10 +90,10 @@ task read_reg(input [1:0] sel, input [2:0] addr);
         end
 endtask
 
-task write_with_driver(input [1:0] sel, input [2:0] addr, input [DATA_WIDTH-1:0] data, input [PDATA_WIDTH-1:0] y);
+task write_with_driver(input [1:0] sel, input [2:0] addr, input [DATA_WIDTH-1:0] data, input [PDATA_WIDTH-1:0] driver_pad);
         begin
                 en_driver = 1;
-                pad_tb_i = y;
+                pad_tb_i = driver_pad;
 
                 reg_mosi_tb[15] = 1;  
                 reg_mosi_tb[14:13] = sel;
@@ -110,11 +110,11 @@ task write_with_driver(input [1:0] sel, input [2:0] addr, input [DATA_WIDTH-1:0]
         end
 endtask
 
-task read_with_driver(input [1:0] sel, input [2:0] addr, input [PDATA_WIDTH-1:0] y);
+task read_with_driver(input [1:0] sel, input [2:0] addr, input [PDATA_WIDTH-1:0] driver_pad);
     begin
         @(posedge clk);
                 en_driver = 1;
-                pad_tb_i = y;
+                pad_tb_i = driver_pad;
 
                 ss = 0;
                 reg_mosi_tb[15] = 0;  
