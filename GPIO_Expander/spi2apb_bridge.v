@@ -97,14 +97,14 @@ assign  en_paddr	= (counter_spi == 4'h6)? 1'b1 : 1'b0;
 assign  en_prdata	= (counter_spi == 4'h9)? 1'b1 : 1'b0;
 assign 	en_reg_psel	= (counter_spi == 4'h3)? 1'b1 : 1'b0;
 
-assign  en_psel_w	= ((counter_spi == 4'hf || counter_spi == 4'h0) && b_pwrite && !ss)? 1'b1 : 1'b0;
+assign  en_psel_w	= ((counter_spi == 4'hf || counter_spi == 4'h0) && b_pwrite && !ss && start)? 1'b1 : 1'b0;
 assign  en_psel_r	= ((counter_spi == 4'h7 || counter_spi == 4'h8) && !b_pwrite)? 1'b1 : 1'b0;
 
-assign	en_penable_w	= (counter_spi == 4'h0 && b_pwrite && !ss)? 1'b1 : 1'b0;
-assign	en_penable_r	= ((counter_spi == 4'h8) && !b_pwrite)? 1'b1 : 1'b0;	
+assign	en_penable_w	= (counter_spi == 4'h0 && b_pwrite && start)? 1'b1 : 1'b0;
+assign	en_penable_r	= ((counter_spi == 4'h8) && start)? 1'b1 : 1'b0;	
 
 assign  b_presetn	= resetn; 
-assign  en_pwdata	= (counter_spi == 4'h0 && !ss)? 1'b1 : 1'b0;
+assign  en_pwdata	= (counter_spi == 4'h0 && !ss && start)? 1'b1 : 1'b0;
 
 assign b_psel		= (en_psel_w & start)? reg_psel : (en_psel_r)? reg_psel : 'b0;
 assign b_penable	= (b_pwrite & start)? en_penable_w : en_penable_r;
